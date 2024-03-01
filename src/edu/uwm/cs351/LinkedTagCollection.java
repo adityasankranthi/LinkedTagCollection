@@ -6,8 +6,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
-public class LinkedTagCollection // need to add parameter, extends and implements
+public class LinkedTagCollection<E> extends AbstractCollection<E> implements TagCollection<E>, Cloneable
+// need to add parameter, extends and implements
 { 	
+	
+
 	private static Consumer<String> reporter = (s) -> System.out.println("Invariant error: "+ s);
 
 	private boolean report(String error) {
@@ -16,6 +19,9 @@ public class LinkedTagCollection // need to add parameter, extends and implement
 	}
 	
 	// TODO: Data structure
+	Node<E> dummy;
+	int version;
+	int size;
 	
 	private boolean wellFormed() {
 		//TODO: Complete this.  Cyclic doubly-linked list with a dummy node.
@@ -24,7 +30,6 @@ public class LinkedTagCollection // need to add parameter, extends and implement
 		return true;
 	}
 	
-		
 	private LinkedTagCollection(boolean ignored) {} // do not change this constructor
 	
 	/** Construct an empty tagged collection.
@@ -35,13 +40,67 @@ public class LinkedTagCollection // need to add parameter, extends and implement
 		assert wellFormed(): "invariant broken by constructor";		
 	}
 	
-
 	// TODO: All the methods!
 	// Make sure to properly document each.
 	// NB: "clone" may suppress warnings about "unchecked"
 	// (Follow the textbook and previous homeworks on the structure for clone.) 
 		
-	private class MyIterator // TODO: implements ...
+	public boolean add(E employee, String tag) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	public E get(int i, String tag) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public E get(int i) {
+		// TODO Auto-generated method stub
+		get(i, null);
+		return null;
+	}
+	
+	@Override // required
+	public Iterator<E> iterator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public Iterator<E> iterator(String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override // required
+	public int size() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override // implementation
+	public LinkedTagCollection<E> clone() {
+		LinkedTagCollection<E> result = null;
+		return result;
+	}
+	
+	private static class Node<T> {
+		String tag;
+		T data;
+		int colVersion;
+		
+		Node<T> prev;
+		Node<T> next;
+		private Node() {
+			this(null, null);
+		}
+		private Node(String t, T d) {
+			this.tag = t;
+			this.data = d;
+			
+		}
+	}
+
+	private class MyIterator implements Iterator<E>// TODO: implements ...
 	{
 		Node<E> cur, next;
 		int colVersion;
@@ -59,6 +118,18 @@ public class LinkedTagCollection // need to add parameter, extends and implement
 			// TODO: initialize fields
 			// (We use a helper method)
 			assert wellFormed() : "iterator constructor didn't satisfy invariant";
+		}
+		
+		@Override // required
+		public boolean hasNext() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override // required
+		public E next() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 			
 		// TODO: Body of iterator class
