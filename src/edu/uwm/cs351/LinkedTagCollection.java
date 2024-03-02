@@ -26,8 +26,54 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	private boolean wellFormed() {
 		//TODO: Complete this.  Cyclic doubly-linked list with a dummy node.
 		// Think: What could possibly go wrong?
+		// 1. dummy is not null
+	    if (dummy == null) {
+	        return report("Dummy node is null");
+	    }
+
+	    // 2. Check if dummy's data and tag fields are both null
+	    if (dummy.data != null || dummy.tag != null) {
+	        return report("Dummy node's data or tag is not null");
+	    }
+
+	    // 3. The node are linked in a cycle beginning and ending with the dummy
+	    // 4. Check if prev links of a node always point back to the node whose next field pointed to them
+	    Node<E> current = dummy.next;
+	    Node<E> prevNode = dummy;
+	    boolean dummySeen = false;
+
+	    if (size == 0) {
+	    	if (dummy.next != dummy || dummy.prev != dummy) return report("Incorrect prev link in a node");
+	    }
+	    else {
+		    while (!dummySeen && current != null) {
+		    	if (current == dummy) dummySeen = true;
+		        if (current.prev != prevNode) {
+		            return report("Incorrect prev link in a node");
+		        }
+		        prevNode = current;
+		        current = current.next;
+		    }
+	    }
+
+	    // 5. Check if none of the links in any of the nodes are null
+	    // 6. Check if none of the tags in any of the non-dummy nodes are null
+	    int count = 0;
+	    current = dummy.next;
+	    while (current != dummy && current != null) {
+	        count++;
+	        if (current.prev == null || current.next == null) return report("Null link in a node");
+	        if (current.tag == null) return report("Null tag in a node");
+	        current = current.next;
+	    }
+	    
+	    // 7. Check if the size field correctly counts the number of non-dummy nodes in the cyclic list
+	    if (count != size) {
+	        return report("Size field does not match the number of non-dummy nodes");
+	    }
+
 		// If no problems discovered, return true
-		return true;
+	    return true;
 	}
 	
 	private LinkedTagCollection(boolean ignored) {} // do not change this constructor
@@ -93,7 +139,7 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		private Node() {
 			this(null, null);
 		}
-		private Node(String t, T d) {
+		private Node(T d, String t) {
 			this.tag = t;
 			this.data = d;
 			
