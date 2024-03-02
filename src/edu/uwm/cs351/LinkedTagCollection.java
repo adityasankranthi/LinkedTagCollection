@@ -132,7 +132,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	private static class Node<T> {
 		String tag;
 		T data;
-		int colVersion;
 		
 		Node<T> prev;
 		Node<T> next;
@@ -154,7 +153,52 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 			
 		private boolean wellFormed() {
 			// TODO: check outer and version and then
-			// what could go wrong?
+            if (!LinkedTagCollection.this.wellFormed()) return false;
+            if (colVersion != LinkedTagCollection.this.version) return true;
+            
+            // what could go wrong?
+            if (cur == null || next == null) return report("cur and next fields are null ");
+            
+            //The next pointer should be the node where the next element to be returned
+            //by the iterator lives
+            if (cur != next ) {
+            	if (tag == null) {
+            		if (cur.next != next) return report("cur and next fields are inconsistent");
+            	}
+            	else {
+            		Node<E> lag = cur;
+                    Node<E> current = cur.next;
+                    while (current != dummy && current != null) {
+                        if (current.tag != null && current.tag.equals(cur.tag)) {
+                            break;
+                        }
+                        current = current.next;
+                    }
+
+                    // Check if lag and current are consistent with cur and next
+                    if (lag != cur || current != next) {
+                        return report("cur and next fields are not consistent");
+                    }
+	            	if (cur.tag != null && next.tag != null) {
+	            		if ((!cur.tag.equals(next.tag)) || (!cur.tag.equals(tag)))return report("cur and next fields are inconsistent");
+	            	}
+	            	else if (cur.tag != null) {
+	        			if ((!cur.tag.equals(tag))) return report("cur and next fields are inconsistent");
+	        		}
+            	}
+                
+            }
+            Node<E> current = dummy.next;
+            while (current != dummy && current != null) {
+                if (current == cur || current == next) {
+                    break;
+                }
+                current = current.next;
+            }
+            if (current != cur ) {
+                return report("Iterator pointers are not within the bounds of the collection");
+            }
+            
 			return true;
 		}
 			
