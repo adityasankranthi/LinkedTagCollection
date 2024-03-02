@@ -25,7 +25,6 @@ I would start off reading the text book to get myself familiar with generic clas
 #### What will I work on first after I finish this planning part?
 I will follow the "What you need to do" after I know that I have sufficient knowledge to work.
 
-
 *The preceding steps should be completed and committed by the
 Friday 10pm deadline.*
 
