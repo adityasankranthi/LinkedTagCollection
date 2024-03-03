@@ -83,27 +83,46 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	public LinkedTagCollection(){
 		// DO NOT ASSERT invariant at beginning of constructor!
 		// TODO: set up data structure
+		dummy = new Node<E>();
+		dummy.next = dummy;
+		dummy.prev = dummy;
+		size = 0;
+		version = 0;
 		assert wellFormed(): "invariant broken by constructor";		
 	}
 	
 	// TODO: All the methods!
 	// Make sure to properly document each.
 	// NB: "clone" may suppress warnings about "unchecked"
-	// (Follow the textbook and previous homeworks on the structure for clone.) 
+	// (Follow the textbook and previous home works on the structure for clone.) 
 		
-	public boolean add(E employee, String tag) {
-		// TODO Auto-generated method stub
-		return true;
+
+	@Override // required
+	public boolean add(E element, String tag) {
+	    assert wellFormed() : "Invariant broken befor adding element";
+		if (tag == null) {
+	        throw new NullPointerException("Tag cannot be null");
+	    }
+	    Node<E> newNode = new Node<>(element, tag);
+	    newNode.next = dummy;
+	    newNode.prev = dummy.prev;
+	    dummy.prev.next = newNode;
+	    dummy.prev = newNode;
+	    size++;
+	    version++;
+	    assert wellFormed() : "Invariant broken after adding element";
+	    return true;
 	}
 
-	public E get(int i, String tag) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	@Override // required
 	public E get(int i) {
-		// TODO Auto-generated method stub
-		get(i, null);
-		return null;
+		return get(i, null);
+	}
+	
+	@Override // required
+	public E get(int i, String tag) {
+		
+		return null; // TODO
 	}
 	
 	@Override // required
@@ -112,6 +131,7 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		return null;
 	}
 	
+	@Override //required
 	public Iterator<E> iterator(String string) {
 		// TODO Auto-generated method stub
 		return null;
@@ -120,7 +140,7 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	@Override // required
 	public int size() {
 		// TODO Auto-generated method stub
-		return 0;
+		return size;
 	}
 	
 	@Override // implementation
@@ -179,6 +199,7 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
                     if (lag != cur || current != next) {
                         return report("cur and next fields are not consistent");
                     }
+                    // cur and next tags are the same
 	            	if (cur.tag != null && next.tag != null) {
 	            		if ((!cur.tag.equals(next.tag)) || (!cur.tag.equals(tag)))return report("cur and next fields are inconsistent");
 	            	}
@@ -188,6 +209,7 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
             	}
                 
             }
+            
             Node<E> current = dummy.next;
             while (current != dummy && current != null) {
                 if (current == cur || current == next) {
@@ -196,7 +218,7 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
                 current = current.next;
             }
             if (current != cur ) {
-                return report("Iterator pointers are not within the bounds of the collection");
+                return report("cur is not within the bounds of the collection");
             }
             
 			return true;
