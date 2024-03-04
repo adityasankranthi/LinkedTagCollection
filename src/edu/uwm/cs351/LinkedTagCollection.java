@@ -116,14 +116,12 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 
 	@Override // required
 	public E get(int i) {
-	    if (i < 0) {
-	        throw new IllegalArgumentException("Index must not be negative");
-	    }
 		return get(i, null);
 	}
 	
 	@Override // required
 	public E get(int i, String tag) {
+		assert wellFormed() : "Invariant broken in get";
 	    if (i < 0) {
 	        throw new IllegalArgumentException("Index must not be negative");
 	    }
@@ -138,10 +136,24 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	    if (index == i && current != dummy && (tag == null || (current.tag != null && current.tag.equals(tag)))) {
 	        return current.data;
 	    }		
+		assert wellFormed() : "Invariant broken by get";
 		return null; // TODO
 	}
 	
-	
+	@Override // required
+	public int size() {
+		// TODO Auto-generated method stub
+		return size;
+	}
+
+	@Override // decorate
+	public LinkedTagCollection<E> clone() {
+		assert wellFormed() : "Invariant broken in clone";
+		LinkedTagCollection<E> result = new LinkedTagCollection<>();
+		assert wellFormed() : "Invariant broken by clone";
+		return result;
+	}
+
 	@Override // required
 	public Iterator<E> iterator() {
 		// TODO Auto-generated method stub
@@ -152,18 +164,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	public Iterator<E> iterator(String string) {
 		// TODO Auto-generated method stub
 		return new MyIterator(string);
-	}
-	
-	@Override // required
-	public int size() {
-		// TODO Auto-generated method stub
-		return size;
-	}
-	
-	@Override // implementation
-	public LinkedTagCollection<E> clone() {
-		LinkedTagCollection<E> result = null;
-		return result;
 	}
 	
 	private static class Node<T> {
@@ -287,6 +287,22 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
             moveToMatch();
 			assert wellFormed() : "invariant broken by next";
 			return cur.data;
+		}
+		
+		@Override //Implementation 
+		public void remove() {
+			// TODO Auto-generated method stub
+			assert wellFormed() : "invariant broken in remove";
+			checkVersion();
+			if (cur == next) throw new IllegalStateException("Nothing to remove");
+			Node<E> prevNode = cur.prev;
+	        Node<E> nextNode = cur.next;
+	        prevNode.next = nextNode;
+	        nextNode.prev = prevNode;
+	        cur = next;
+	        size--;
+	        colVersion = ++version;
+			assert wellFormed() : "invariant broken by remove";
 		}		
 	}
 		
