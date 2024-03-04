@@ -33,14 +33,17 @@ Friday 10pm deadline.*
 ### Review
 
 #### Did I correctly anticipate the difficulties?
+yes, I was able to anticipate the difficulties as this was a similar problem we dealt with in homework3.
 
 #### How did the plan go?
-
+The plan went well as I was aware of writing cleaner code.
 ### Preview
 
 #### What should I do differently for next week's homework assignment?
+As always start early.
 
 #### Do I need more resources?
+I felt the pre recorded lectures and the textbook were sufficient.
 
 ## Optional Feedback
 
