@@ -125,17 +125,17 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	    if (i < 0) {
 	        throw new IllegalArgumentException("Index must not be negative");
 	    }
-		Node<E> current = dummy.next;
-		int index = 0;
-	    while (current != dummy && index < i) {
+	    Node<E> current = dummy.next;
+	    int index = 0;
+	    while (current != dummy && index <= i) {
 	        if (tag == null || (current.tag != null && current.tag.equals(tag))) {
+	            if (index == i) {
+	                return current.data;
+	            }
 	            index++;
 	        }
 	        current = current.next;
-	    }
-	    if (index == i && current != dummy && (tag == null || (current.tag != null && current.tag.equals(tag)))) {
-	        return current.data;
-	    }		
+	    }	
 		assert wellFormed() : "Invariant broken by get";
 		return null; // TODO
 	}
@@ -146,14 +146,36 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		return size;
 	}
 
-	@Override // decorate
+
+	@SuppressWarnings("unchecked")
+	@Override
 	public LinkedTagCollection<E> clone() {
-		assert wellFormed() : "Invariant broken in clone";
-		LinkedTagCollection<E> result = new LinkedTagCollection<>();
-		assert wellFormed() : "Invariant broken by clone";
-		return result;
+	    LinkedTagCollection<E> result;
+	    try {
+	    	result = (LinkedTagCollection<E>) super.clone();
+	    	result.dummy = new Node<>();
+	    	result.dummy.next = result.dummy;
+	    	result.dummy.prev = result.dummy;
+	        
+	        Node<E> current = dummy.next;
+	        while (current != dummy) {
+	            Node<E> newNode = new Node<>(current.data, current.tag);
+	            newNode.prev = result.dummy.prev;
+	            newNode.next = result.dummy;
+	            result.dummy.prev.next = newNode;
+	            result.dummy.prev = newNode;
+	            current = current.next;
+	        }
+	        result.size = this.size;
+	        result.version = this.version;
+	        assert result.wellFormed() : "Invariant broken in result of clone";
+	    } catch (CloneNotSupportedException e) {
+	        throw new AssertionError(e);
+	    }
+	    return result;
 	}
 
+	
 	@Override // required
 	public Iterator<E> iterator() {
 		// TODO Auto-generated method stub
