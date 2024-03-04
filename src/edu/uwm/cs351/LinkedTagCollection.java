@@ -7,41 +7,31 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 public class LinkedTagCollection<E> extends AbstractCollection<E> implements TagCollection<E>, Cloneable
-// need to add parameter, extends and implements
 { 	
-	
-
 	private static Consumer<String> reporter = (s) -> System.out.println("Invariant error: "+ s);
 
 	private boolean report(String error) {
 		reporter.accept(error);
 		return false;
 	}
-	
-	// TODO: Data structure
-	Node<E> dummy;
-	int version;
-	int size;
+	private Node<E> dummy;
+	private int version;
+	private int size;
 	
 	private boolean wellFormed() {
-		//TODO: Complete this.  Cyclic doubly-linked list with a dummy node.
-		// Think: What could possibly go wrong?
 		// 1. dummy is not null
 	    if (dummy == null) {
 	        return report("Dummy node is null");
 	    }
-
 	    // 2. Check if dummy's data and tag fields are both null
 	    if (dummy.data != null || dummy.tag != null) {
 	        return report("Dummy node's data or tag is not null");
 	    }
-
 	    // 3. The node are linked in a cycle beginning and ending with the dummy
 	    // 4. Check if prev links of a node always point back to the node whose next field pointed to them
 	    Node<E> current = dummy.next;
 	    Node<E> prevNode = dummy;
 	    boolean dummySeen = false;
-
 	    if (size == 0) {
 	    	if (dummy.next != dummy || dummy.prev != dummy) return report("Incorrect prev link in a node");
 	    }
@@ -55,7 +45,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		        current = current.next;
 		    }
 	    }
-
 	    // 5. Check if none of the links in any of the nodes are null
 	    // 6. Check if none of the tags in any of the non-dummy nodes are null
 	    int count = 0;
@@ -66,13 +55,10 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	        if (current.tag == null) return report("Null tag in a node");
 	        current = current.next;
 	    }
-	    
 	    // 7. Check if the size field correctly counts the number of non-dummy nodes in the cyclic list
 	    if (count != size) {
 	        return report("Size field does not match the number of non-dummy nodes");
 	    }
-
-		// If no problems discovered, return true
 	    return true;
 	}
 	
@@ -81,8 +67,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	/** Construct an empty tagged collection.
 	 */
 	public LinkedTagCollection(){
-		// DO NOT ASSERT invariant at beginning of constructor!
-		// TODO: set up data structure
 		dummy = new Node<E>();
 		dummy.next = dummy;
 		dummy.prev = dummy;
@@ -91,12 +75,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		assert wellFormed(): "invariant broken by constructor";		
 	}
 	
-	// TODO: All the methods!
-	// Make sure to properly document each.
-	// NB: "clone" may suppress warnings about "unchecked"
-	// (Follow the textbook and previous home works on the structure for clone.) 
-		
-
 	@Override // required
 	public boolean add(E element, String tag) {
 	    assert wellFormed() : "Invariant broken befor adding element";
@@ -137,19 +115,26 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	        current = current.next;
 	    }	
 		assert wellFormed() : "Invariant broken by get";
-		return null; // TODO
+		return null; 
 	}
 	
+    /**
+     * returns the size of the dynamic array
+     * @return size.
+     */
 	@Override // required
 	public int size() {
-		// TODO Auto-generated method stub
 		return size;
 	}
 
-
+    /**
+     * clones an object of type LinkedTagCollection
+     * @return LinkedTagCollection object.
+     */
 	@SuppressWarnings("unchecked")
-	@Override
+	@Override //decorate
 	public LinkedTagCollection<E> clone() {
+		assert wellFormed() : "Invariant broken in clone";
 	    LinkedTagCollection<E> result;
 	    try {
 	    	result = (LinkedTagCollection<E>) super.clone();
@@ -172,52 +157,46 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 	    } catch (CloneNotSupportedException e) {
 	        throw new AssertionError(e);
 	    }
+	    assert wellFormed() : "Invariant broken by clone";
 	    return result;
 	}
 
-	
+    /**
+     * zero argument Iterator
+     */
 	@Override // required
 	public Iterator<E> iterator() {
-		// TODO Auto-generated method stub
 		return iterator(null);
 	}
-	
+
 	@Override //required
 	public Iterator<E> iterator(String string) {
-		// TODO Auto-generated method stub
 		return new MyIterator(string);
 	}
 	
 	private static class Node<T> {
 		String tag;
 		T data;
-		
-		Node<T> prev;
-		Node<T> next;
-		private Node() {
+		Node<T> prev, next;
+		Node() {
 			this(null, null);
 		}
 		private Node(T d, String t) {
 			this.tag = t;
 			this.data = d;
-			
 		}
 	}
 
-	private class MyIterator implements Iterator<E>// TODO: implements ...
+	private class MyIterator implements Iterator<E>// 
 	{
-		Node<E> cur, next;
-		int colVersion;
-		String tag;
+		private Node<E> cur, next;
+		private int colVersion;
+		private String tag;
 			
 		private boolean wellFormed() {
-			// TODO: check outer and version and then
             if (!LinkedTagCollection.this.wellFormed()) return false;
             if (colVersion != LinkedTagCollection.this.version) return true;
-            
-            // what could go wrong?
             if (cur == null || next == null) return report("cur and next fields are null ");
-            
             //The next pointer should be the node where the next element to be returned
             //by the iterator lives
             if (cur != next ) {
@@ -233,7 +212,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
                         }
                         current = current.next;
                     }
-
                     // Check if lag and current are consistent with cur and next
                     if (lag != cur || current != next) {
                         return report("cur and next fields are not consistent");
@@ -248,7 +226,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
             	}
                 
             }
-            
             Node<E> current = dummy.next;
             while (current != dummy && current != null) {
                 if (current == cur || current == next) {
@@ -266,8 +243,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		MyIterator(boolean ignored) {} // do not change this constructor
 			
 		MyIterator(String t) {
-			// TODO: initialize fields
-			// (We use a helper method)
 			this.tag = t;
 			this.colVersion = version;
 			this.next = dummy.next;
@@ -276,12 +251,12 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 			assert wellFormed() : "iterator constructor didn't satisfy invariant";
 		}
 		
-		// TODO: Body of iterator class
 		private void moveToMatch() {
 			while (tag != null && next!= dummy && !tag.equals(next.tag)) {
 				next = next.next;
 			}
 		}
+		
 		private void checkVersion() {
 			if (colVersion != version) {
                 throw new ConcurrentModificationException("Collection was modified during iteration");
@@ -290,7 +265,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		
 		@Override // required
 		public boolean hasNext() {
-			// TODO Auto-generated method stub
 			assert wellFormed() : "invariant broken in hasNext";
             checkVersion();
 			assert wellFormed() : "invariant broken by hasNext";
@@ -299,7 +273,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 
 		@Override // required
 		public E next() {
-			// TODO Auto-generated method stub
 			assert wellFormed() : "invariant broken in next";
             if (!hasNext()) {
                 throw new NoSuchElementException();
@@ -313,7 +286,6 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		
 		@Override //Implementation 
 		public void remove() {
-			// TODO Auto-generated method stub
 			assert wellFormed() : "invariant broken in remove";
 			checkVersion();
 			if (cur == next) throw new IllegalStateException("Nothing to remove");
