@@ -116,25 +116,42 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 
 	@Override // required
 	public E get(int i) {
+	    if (i < 0) {
+	        throw new IllegalArgumentException("Index must not be negative");
+	    }
 		return get(i, null);
 	}
 	
 	@Override // required
 	public E get(int i, String tag) {
-		
+	    if (i < 0) {
+	        throw new IllegalArgumentException("Index must not be negative");
+	    }
+		Node<E> current = dummy.next;
+		int index = 0;
+	    while (current != dummy && index < i) {
+	        if (tag == null || (current.tag != null && current.tag.equals(tag))) {
+	            index++;
+	        }
+	        current = current.next;
+	    }
+	    if (index == i && current != dummy && (tag == null || (current.tag != null && current.tag.equals(tag)))) {
+	        return current.data;
+	    }		
 		return null; // TODO
 	}
+	
 	
 	@Override // required
 	public Iterator<E> iterator() {
 		// TODO Auto-generated method stub
-		return null;
+		return iterator(null);
 	}
 	
 	@Override //required
 	public Iterator<E> iterator(String string) {
 		// TODO Auto-generated method stub
-		return null;
+		return new MyIterator(string);
 	}
 	
 	@Override // required
@@ -229,22 +246,48 @@ public class LinkedTagCollection<E> extends AbstractCollection<E> implements Tag
 		MyIterator(String t) {
 			// TODO: initialize fields
 			// (We use a helper method)
+			this.tag = t;
+			this.colVersion = version;
+			this.next = dummy.next;
+			moveToMatch();
+			this.cur = this.next;
 			assert wellFormed() : "iterator constructor didn't satisfy invariant";
+		}
+		
+		// TODO: Body of iterator class
+		private void moveToMatch() {
+			while (tag != null && next!= dummy && !tag.equals(next.tag)) {
+				next = next.next;
+			}
+		}
+		private void checkVersion() {
+			if (colVersion != version) {
+                throw new ConcurrentModificationException("Collection was modified during iteration");
+            }
 		}
 		
 		@Override // required
 		public boolean hasNext() {
 			// TODO Auto-generated method stub
-			return false;
+			assert wellFormed() : "invariant broken in hasNext";
+            checkVersion();
+			assert wellFormed() : "invariant broken by hasNext";
+			return next != dummy;
 		}
 
 		@Override // required
 		public E next() {
 			// TODO Auto-generated method stub
-			return null;
-		}
-			
-		// TODO: Body of iterator class
+			assert wellFormed() : "invariant broken in next";
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            cur = next;
+            next = next.next;
+            moveToMatch();
+			assert wellFormed() : "invariant broken by next";
+			return cur.data;
+		}		
 	}
 		
 	public static class Spy<T> {
